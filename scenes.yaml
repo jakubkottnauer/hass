@@ -1,0 +1,98 @@
+- name: livingroom_normal
+  entities:
+    light.party_lamp:
+      state: on
+      transition: 3
+      kelvin: 2700
+      brightness: 220
+    light.living_room_ceiling: # necessary to use HA group instead of IKEA group, otherwise temperature cannot be changed
+      state: on
+      transition: 3
+      kelvin: 2700
+      brightness: 220
+    light.gateway_light:
+      state: off
+
+- name: livingroom_dim
+  entities:
+    light.party_lamp:
+      state: on
+      transition: 3
+      kelvin: 2700
+      brightness: 60
+    light.living_room_ceiling:
+      state: on
+      transition: 3
+      kelvin: 2700
+      brightness: 60
+    light.gateway_light:
+      state: on
+      rgb_color: [102,102,255]
+      brightness: 70
+    
+
+- name: livingroom_studying
+  entities:
+    light.party_lamp:
+      state: on
+      transition: 3
+      kelvin: 4100
+      brightness: 255
+    light.living_room_ceiling:
+      state: on
+      transition: 3
+      kelvin: 4100
+      brightness: 255
+    light.gateway_light:
+      state: off
+
+
+- name: livingroom_romantic
+  entities:
+    light.party_lamp:
+      state: on
+      transition: 3
+      kelvin: 2600
+      brightness: 35
+    light.living_room_ceiling:
+      state: on
+      transition: 3
+      rgb_color: [204,51,0]
+      brightness: 40
+    light.gateway_light:
+      state: off
+
+
+- name: bedroom_normal
+  entities:
+    light.desk_lamp:
+      state: off
+    light.bedroom_ceiling:
+      state: on
+      transition: 3
+      kelvin: 2700
+      brightness: 220
+    
+
+- name: bedroom_studying
+  entities:
+    light.desk_lamp:
+      state: on
+      transition: 3
+      kelvin: 4100
+      brightness: 255
+    light.bedroom_ceiling:
+      state: on
+      transition: 3
+      kelvin: 4100
+      brightness: 255
+      
+- name: bedroom_romantic
+  entities:
+    light.desk_lamp:
+      state: off
+    light.bedroom_ceiling:
+      state: on
+      transition: 3
+      rgb_color: [204,51,0]
+      brightness: 40

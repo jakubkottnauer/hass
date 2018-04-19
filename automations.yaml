@@ -1,0 +1,298 @@
+- alias: Start HomeKit automatically
+  hide_entity: true
+  trigger:
+    platform: homeassistant
+    event: start
+  action:
+    - delay: 00:01
+    - service: homekit.start
+
+# Presence
+- alias: Flat - turn on lights on arrival
+  trigger:
+    platform: state
+    entity_id: group.people
+    to: 'home'
+  condition:
+    condition: time
+    after: '20:00'
+    before: '23:59'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.livingroom_normal
+    - service: light.turn_on
+      entity_id: light.chodba
+
+# Bathroom
+- alias: Bathroom - turn on motion on
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_bathroom
+    to: 'on'
+  action:
+    service: light.turn_on
+    entity_id: light.bathroom
+
+
+- alias: Bathroom - turn off motion off
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_bathroom
+    to: 'off'
+    for:
+      minutes: 1
+  action:
+    service: light.turn_off
+    entity_id: light.bathroom
+    
+# Toilet automation
+- alias: Toilet - toggle when door open during day
+  trigger:
+    platform: state
+    entity_id: binary_sensor.door_sensor_toilet
+    from: 'off'
+    to: 'on'
+  condition:
+    condition: time
+    after: '07:00'
+    before: '23:00'
+  action:
+    service: light.toggle
+    entity_id: light.toilet
+
+- alias: Toilet - toggle when door open during night
+  trigger:
+    platform: state
+    entity_id: binary_sensor.door_sensor_toilet
+    from: 'off'
+    to: 'on'
+  condition:
+    condition: time
+    after: '23:00'
+    before: '7:00'
+  action:
+    service: light.toggle
+    entity_id: light.toilet
+
+# Alarm clock automations
+# TODO: convert these into a script
+- id: alarm_clock_activated
+  alias: Alarm clock - goes off
+  trigger:
+  - platform: template
+    value_template: '{{ states.sensor.time.state == states.sensor.alarm_clock_time_long.state }}'
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: input_boolean.alarm_clock_status
+      state: 'on'
+    - condition: state
+      entity_id: group.people
+      state: 'home'
+    - condition: state
+      entity_id: sun.sun
+      state: 'below_horizon'  
+  action:
+    - service: scene.turn_on
+      entity_id: scene.livingroom_normal
+    - service: light.turn_on
+      entity_id: light.chodba
+    # - service: light.turn_on
+      #entity_id: light.bedroom_ceiling
+
+- id: alarm_clock_activated_everytime
+  alias: Alarm clock - goes off - play spotify
+  trigger:
+  - platform: template
+    value_template: '{{ states.sensor.time.state == states.sensor.alarm_clock_time_long.state }}'
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: input_boolean.alarm_clock_status
+      state: 'on'
+    - condition: state
+      entity_id: group.people
+      state: 'home'
+  action:
+    - service: media_player.media_play
+      entity_id: media_player.sonos
+
+- alias: Fade in Lights in Bedroom
+  trigger:
+    platform: time
+    seconds: 00
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.alarm_clock_status
+        state: 'on'
+      - condition: state
+        entity_id: group.people
+        state: 'home'
+      - condition: state
+        entity_id: sun.sun
+        state: 'below_horizon' 
+      - condition: template
+        value_template: '{{ (utcnow().strftime("%s") | int + states.sensor.alarm_clock_fade_in_minutes.state | int * 60) | timestamp_custom("%H:%M") == states.sensor.alarm_clock_time.state }}'
+  action:
+    service: script.bedroom_light_fade_in
+
+# Evening automations
+- alias: Turn on living room before sunset
+  # only if lights haven't been turned on manually
+  # and somebody is at home
+  trigger:
+    platform: sun
+    event: sunset
+    offset: "-00:40:00"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: group.people
+        state: 'home'
+      - condition: state
+        entity_id: light.living_room_ceiling
+        state: 'off'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.livingroom_studying
+
+- alias: Turn on hall light before sunset
+  # only if lights haven't been turned on manually
+  # and somebody is at home
+  trigger:
+    platform: sun
+    event: sunset
+    offset: "-01:00:00"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: group.people
+        state: 'home'
+  action:
+    - service: light.turn_on
+      entity_id: light.chodba
+
+
+# Plex automations
+- alias: Plex - living room playing
+  trigger:
+    platform: state
+    entity_id: media_player.plex_tv
+    to: 'playing'
+  condition:
+    condition: state
+    entity_id: light.party_lamp 
+    state: 'on'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.livingroom_dim
+    - service: light.turn_off
+      entity_id: light.chodba
+
+- alias: Plex - living room paused
+  trigger:
+    platform: state
+    entity_id: media_player.plex_tv
+    to: 'paused'
+  condition:
+    condition: state
+    entity_id: light.party_lamp 
+    state: 'on'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.livingroom_normal
+    - service: light.turn_on
+      entity_id: light.chodba
+
+- alias: Plex - living room stopped
+  trigger:
+    platform: state
+    entity_id: media_player.plex_tv
+    to: 'idle'
+  condition:
+    condition: state
+    entity_id: light.party_lamp 
+    state: 'on'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.livingroom_normal
+    - service: light.turn_on
+      entity_id: light.chodba
+
+
+# Xiaomi switch automations
+- alias: Main door switch - turn off lights
+  trigger:
+    platform: event
+    event_type: click
+    event_data:
+      entity_id: binary_sensor.switch_main_door
+      click_type: single
+  condition:
+    condition: state
+    entity_id: group.all_lights
+    state: 'on'
+  action:
+    - service: homeassistant.turn_off
+      data:
+        entity_id: group.all_lights
+    - service: media_player.turn_off
+      data:
+        entity_id: media_player.sonos
+    - service: media_player.turn_off
+      data:
+        entity_id: media_player.samsung
+        
+
+- alias: Main door switch - single click - turn on some lights
+  trigger:
+    platform: event
+    event_type: click
+    event_data:
+      entity_id: binary_sensor.switch_main_door
+      click_type: single
+  condition:
+    condition: state
+    entity_id: group.all_lights
+    state: 'off'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.livingroom_normal
+    - service: light.turn_on
+      entity_id: light.chodba
+      
+- alias: Main door switch - double click - turn on all lights
+  trigger:
+    platform: event
+    event_type: click
+    event_data:
+      entity_id: binary_sensor.switch_main_door
+      click_type: double
+  condition:
+    condition: state
+    entity_id: group.all_lights
+    state: 'off'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.livingroom_normal
+    - service: light.turn_on
+      entity_id: light.chodba
+    - service: light.turn_on
+      entity_id: light.bedroom_ceiling
+      
+- alias: Bedroom - irrigation
+  initial_state: False
+  trigger:
+    platform: time
+    at: '14:20:00'
+  action:
+    service: mqtt.publish
+    data:
+      topic: "home/bedroom/avocado/irrigate"
+      payload: "water_avocado"

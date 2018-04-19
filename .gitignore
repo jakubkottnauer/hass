@@ -1,0 +1,4 @@
+.DS_Store
+secrets.yaml
+plex.conf
+known_devices.yaml

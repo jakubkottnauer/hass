@@ -1,0 +1,134 @@
+homeassistant:
+  name: Home
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  elevation: !secret home_elevation
+  unit_system: metric
+  time_zone: Europe/Prague
+  customize: !include customize.yaml
+
+# Enables the frontend
+frontend:
+
+# Enables configuration UI
+config:
+
+# Discover some devices automatically
+discovery:
+
+tradfri:
+  host: 192.168.0.200
+
+device_tracker:
+  - platform: upc_connect
+    interval_seconds: 15
+    consider_home: 300
+    host: 192.168.0.1
+    hosts:
+      kuba_iphone: 192.168.0.108
+      kristynka_iphone: 192.168.0.17
+
+xiaomi_aqara:
+  discovery_retry: 10
+  gateways:
+    - mac: 78:11:DC:B2:25:3F
+      key: !secret xiaomi_gateway_key
+      host: 192.168.0.186
+
+media_player:
+  - platform: plex
+    scan_interval: 5
+    use_custom_entity_ids: true
+    remove_unavailable_clients: false
+  - platform: samsungtv
+    host: 192.168.0.199
+    port: 8001
+    mac: "C0:48:E6:1B:4E:77"
+    name: Samsung
+
+# history:
+# logbook:
+
+map:
+ios:
+sun:
+
+# Weather prediction
+sensor:
+  - platform: yr
+  - platform: plex
+
+# Homekit
+homekit:
+  auto_start: False # necessary for homekit to work reliably. There is an automation that starts homekit after a minute
+  filter:
+    include_domains:
+      - media_player
+      - light
+
+mqtt:
+  broker: 192.168.0.3
+  client_id: ha_synology
+  username: !secret mqtt_username
+  password: !secret mqtt_password
+  
+
+# Cloud
+cloud:
+  alexa:
+    filter:
+      include_entities:
+        - light.bathroom
+        - light.bedroom_ceiling
+        - light.desk_lamp
+        - light.chodba
+        - light.gateway_light
+        - light.hall
+        - light.living_room_ceiling
+        - light.party_lamp
+        - light.toilet
+        - media_player.samsung
+      exclude_domains:
+        - automation
+        - group
+        - media_player
+        - switch
+        - sensor
+        - input_boolean
+        - light
+        - script
+    entity_config:
+      light.desk_lamp:
+        name: Desk lamp
+      light.party_lamp:
+        name: Party lamp
+      light.chodba:
+        name: Hall light
+      light.living_room_ceiling:
+        name: Living room ceiling
+      light.bedroom_ceiling:
+        name: Bedroom ceiling
+      light.bathroom:
+        name: Bathroom
+      media_player.samsung:
+        name: TV
+        display_categories: TV
+      scene.livingroom_dim:
+        name: Living room dim
+      scene.livingroom_normal:
+        name: Living room normal
+      scene.livingroom_studying:
+        name: Living room studying
+      scene.bedroom_normal:
+        name: Bedroom normal
+      scene.bedroom_studying:
+        name: Bedroom studying
+
+light: !include lights.yaml
+scene: !include scenes.yaml
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+sensor: !include sensors.yaml
+input_number: !include input_number.yaml
+input_boolean: !include input_boolean.yaml

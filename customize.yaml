@@ -1,0 +1,45 @@
+group.all_automations:
+  hidden: false
+  friendly_name: 'Automatizace'
+
+group.all_scripts:
+  hidden: false
+  friendly_name: 'Skripty'
+
+light.desk_lamp:
+  friendly_name: Desk lamp
+  icon: mdi:lightbulb-outline
+light.party_lamp:
+  friendly_name: Party lamp
+light.gateway_light:
+  friendly_name: Hub light
+
+scene.livingroom_dim:
+  friendly_name: 'Nízký jas'
+  icon: mdi:brightness-7
+scene.livingroom_normal:
+  friendly_name: 'Normální'
+  icon: mdi:star-circle
+scene.livingroom_studying:
+  friendly_name: 'Učení'
+scene.livingroom_romantic:
+  friendly_name: ':)'
+ 
+scene.bedroom_normal:
+  friendly_name: 'Normální'
+scene.bedroom_studying:
+  friendly_name: 'Učení'
+scene.bedroom_romantic:
+  friendly_name: ':)'
+
+binary_sensor.switch_main_door:
+  friendly_name: Xiaomi switch
+binary_sensor.motion_sensor_bathroom:
+  friendly_name: Xiaomi motion sensor
+binary_sensor.door_sensor_toilet:
+  friendly_name: Xiaomi door sensor
+  
+device_tracker.2cf0a2544b97:
+  friendly_name: Kuba
+device_tracker.2cf0a2e40352:
+  friendly_name: Kristýnka

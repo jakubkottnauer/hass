@@ -1,0 +1,27 @@
+- platform: yeelight
+  devices:
+    192.168.0.101: # zarovka obyvak
+      name: party_lamp
+      use_music_mode: True
+    192.168.0.213: # loznice lampicka
+      name: desk_lamp
+    192.168.0.178: # loznice lampicka
+      name: bedroom_ceiling_1
+
+- platform: group
+  name: Living room corner lights
+  entities:
+    - light.party_lamp
+    - light.gateway_light
+    
+- platform: group
+  name: Living room ceiling
+  entities:
+    - light.obyvak_strop_1
+    - light.obyvak_strop_2
+
+- platform: group
+  name: Bedroom ceiling
+  entities:
+    # - light.yeelight_rgb_7811dca8040c
+    - light.bedroom_ceiling_1
